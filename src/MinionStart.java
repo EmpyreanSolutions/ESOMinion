@@ -10,9 +10,11 @@ public class MinionStart extends Application
 		new MinionController();		
 	}
 	
+	
 	public static void main(String[] args)
 	{
 		launch(args);
+		//sldfjlsdfj
 	}
 
 }
