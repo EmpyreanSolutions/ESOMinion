@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import Utility.MouseFunctions;
 import View.MinionUI;
+import javafx.application.Platform;
 
 public class GlyphMaker
 {
@@ -183,89 +184,105 @@ public class GlyphMaker
 
 	public void makeGlyphs()
 	{
-		try
+
+		new Thread(new Runnable() 
 		{
-			minion = new Robot();
-		}
-		catch(AWTException e)
-		{
-			e.printStackTrace();
-		}
-		catch(Exception e)
-		{
-			System.out.println("unknown error at minion creation.");
-			view.addText("\nunknown error at minion creation.");
-		}
+			@Override
+			public void run() 
+			{
+				
+			
+				try
+				{
+					minion = new Robot();
+				}
+				catch(AWTException e)
+				{
+					e.printStackTrace();
+				}
+				catch(Exception e)
+				{
+					System.out.println("unknown error at minion creation.");
+					view.addText("\nunknown error at minion creation.");
+				}
+		
+				// center of screen and make active window
+				minion.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
+				mouse.mouseClick();
+				minion.delay(500);
+		
+				do
+				{
+					potencyFound = false;
+					aspectFound = false;
+					essenceFound = false;
+		
+					if(potencyCheck())
+					{
+						System.out.println("POTENCY CHECK!");
+						view.addText("Potency Check!");
+						potencyFound = true;
+					}
+					else
+					{
+						System.out.println("Didnt find potency");
+						view.addText("Didnt find potency");
+						potencyFound = false;
+						minion.delay(5000);
+						// add potency
+					}
+		
+					if(aspectCheck())
+					{
+						System.out.println("ASPECT CHECK!");
+						view.addText("Aspect Check!");
+						aspectFound = true;
+					}
+					else
+					{
+						System.out.println("Didnt find aspect");
+						view.addText("Didnt find aspect");
+						// add aspect
+						potencyFound = false;
+					}
+		
+					if(essenceCheck())
+					{
+						System.out.println("ESSENCE CHECK!");
+						view.addText("Essence Check!");
+						essenceFound = true;
+					}
+					else
+					{
+						System.out.println("Didnt find essence");
+						view.addText("Didnt find essence");
+						// add essence
+						potencyFound = false;
+					}
+		
+					if(potencyFound && aspectFound && essenceFound)
+					{
+						System.out.println("Crafting now..");
+						view.addText("\nCrafting...");
+						minion.keyPress(KeyEvent.VK_R);
+						minion.keyRelease(KeyEvent.VK_R);
+						minion.delay(4000);
+					}
+					else
+					{
+						System.out.println("CRAFTING FAILED");
+						view.addText("\nCrafting failed");
+					}
+		
+				} // end of do
+				while(potencyFound && aspectFound && essenceFound);
+				System.out.println("FINISHED");
+			
+				view.addText("Glyph Maker is done.");
+			} // end of ren
+		}).start();
 
-		// center of screen and make active window
-		minion.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
-		mouse.mouseClick();
-		minion.delay(500);
-
-		do
-		{
-			potencyFound = false;
-			aspectFound = false;
-			essenceFound = false;
-
-			if(potencyCheck())
-			{
-				System.out.println("POTENCY CHECK!");
-				view.addText("Potency Check!");
-				potencyFound = true;
-			}
-			else
-			{
-				System.out.println("Didnt find potency");
-				view.addText("Didnt find potency");
-				potencyFound = false;
-				// add potency
-			}
-
-			if(aspectCheck())
-			{
-				System.out.println("ASPECT CHECK!");
-				view.addText("Aspect Check!");
-				aspectFound = true;
-			}
-			else
-			{
-				System.out.println("Didnt find aspect");
-				view.addText("Didnt find aspect");
-				// add aspect
-				potencyFound = false;
-			}
-
-			if(essenceCheck())
-			{
-				System.out.println("ESSENCE CHECK!");
-				view.addText("Essence Check!");
-				essenceFound = true;
-			}
-			else
-			{
-				System.out.println("Didnt find essence");
-				view.addText("Didnt find essence");
-				// add essence
-				potencyFound = false;
-			}
-
-			if(potencyFound && aspectFound && essenceFound)
-			{
-				System.out.println("Crafting now..");
-				view.addText("\nCrafting...");
-				minion.keyPress(KeyEvent.VK_R);
-				minion.keyRelease(KeyEvent.VK_R);
-				minion.delay(4000);
-			}
-			else
-			{
-				System.out.println("CRAFTING FAILED");
-				view.addText("\nCrafting failed");
-			}
-
-		}
-		while(potencyFound && aspectFound && essenceFound);
-		System.out.println("FINISHED");
+		
 	}
+	
 }
