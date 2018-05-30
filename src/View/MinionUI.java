@@ -114,6 +114,13 @@ public class MinionUI
 	public void addText(String text)
 	{
 		textArea.appendText("\n" + text);
-		textArea.requestFocus();
+//		Platform.runLater(new Runnable()
+//		{
+//			@Override
+//			public void run()
+//			{
+//				textArea.appendText("\n" + text);						
+//			}
+//		});
 	}
 }

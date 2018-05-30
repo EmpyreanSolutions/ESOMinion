@@ -17,7 +17,7 @@ public class MinionController
 		System.out.println("Running Glyph Maker");
 		minionUI.addText("\nRunning Glyph Maker");
 		new GlyphMaker(minionUI);
-		minionUI.addText("Glyph Maker is done.");
+		
 	}
 	
 	public void runGlyphDestroyer()
