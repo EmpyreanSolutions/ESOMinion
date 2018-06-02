@@ -3,26 +3,26 @@ package Controller;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import Utility.MouseFunctions;
 import View.MinionUI;
-import javafx.application.Platform;
 
 public class GlyphMaker
 {
-	private MinionUI view;
+	private MinionUI minionUI;
 	private Dimension dimension;
 	private final int SCREEN_WIDTH;
 	private final int SCREEN_HEIGHT;
 
-	private Robot minion;
+	private Robot robot;
 	private MouseFunctions mouse;
 
 	// potency (square), aspect (circle), essence (triangle)
-	private ArrayList<Color> potencyColor;
+	private Color potencyColor;
 	private ArrayList<Color> aspectColor;
 	private ArrayList<Color> essenceColor;
 
@@ -41,35 +41,42 @@ public class GlyphMaker
 	private int essenceX2;
 	private int essenceY1;
 	private int essenceY2;
-	// search box for runes in inventory
-	private int inventoryX1;
-	private int inventoryX2;
-	private int inventoryY1;
-	private int inventoryY2;
+	// search positions for runes in inventory
+	private ArrayList<Point> invPositions;
 	// booleans for if rune is not found; triggers rune find
 	private boolean potencyFound;
 	private boolean aspectFound;
 	private boolean essenceFound;
 
-	public GlyphMaker(MinionUI v)
+	private Point potencyTab;
+
+	private int aspectTabX;
+	private int aspectTabY;
+
+	private int essenceTabX;
+	private int essenceTabY;
+
+	public GlyphMaker(MinionUI minionUI)
 	{
-		view = v;
-		System.out.println("gmv: " + view);
+		this.minionUI = minionUI;
 		mouse = new MouseFunctions();
+
+		// Color *NEW*
+		// square rune colors
+		potencyColor = new Color(184, 200, 210);
+
 		// arraylist
-		potencyColor = new ArrayList<Color>();
 		aspectColor = new ArrayList<Color>();
 		essenceColor = new ArrayList<Color>();
+
 		// screen
 		dimension = Toolkit.getDefaultToolkit().getScreenSize();
 		SCREEN_WIDTH = (int) dimension.getWidth();
 		SCREEN_HEIGHT = (int) dimension.getHeight();
-		// square rune colors
-		potencyColor.add(new Color(184, 200, 210));
-		potencyColor.add(new Color(200, 210, 220));
 
 		// circle rune colors
 		aspectColor.add(new Color(194, 200, 167));
+
 		// triangle rune colors
 		essenceColor.add(new Color(214, 196, 168));
 
@@ -89,15 +96,26 @@ public class GlyphMaker
 		essenceY1 = 894;
 		essenceY2 = 905;
 
-		inventoryX1 = 1380;
-		inventoryX2 = 1440;
-		inventoryY1 = 320;
-		inventoryY2 = 900;
+		// the inventory without scrolls has *11* visible positions
+		invPositions = new ArrayList<Point>();
+		invPositions.add(new Point(1420, 350));
+		invPositions.add(new Point(1420, 400));
+		invPositions.add(new Point(1420, 450));
+		invPositions.add(new Point(1420, 500));
+		invPositions.add(new Point(1420, 550));
+		invPositions.add(new Point(1420, 600));
+		invPositions.add(new Point(1420, 650));
+		invPositions.add(new Point(1420, 700));
+		invPositions.add(new Point(1420, 755));
+		invPositions.add(new Point(1420, 805));
+		invPositions.add(new Point(1420, 855));
 
 		potencyFound = false;
 		aspectFound = false;
 		essenceFound = false;
-		
+
+		potencyTab = new Point(1790, 255);
+
 		makeGlyphs();
 	}
 
@@ -108,12 +126,14 @@ public class GlyphMaker
 
 			for(int j = potencyY1; j <= potencyY2; j++)
 			{
-				for(int k = 0; k < potencyColor.size(); k++)
+				if(robot.getPixelColor(i, j).getRed() >= potencyColor.getRed() - 10
+						&& robot.getPixelColor(i, j).getRed() <= potencyColor.getRed() + 10
+						&& robot.getPixelColor(i, j).getGreen() >= potencyColor.getGreen() - 10
+						&& robot.getPixelColor(i, j).getGreen() <= potencyColor.getGreen() + 10
+						&& robot.getPixelColor(i, j).getBlue() >= potencyColor.getBlue() - 10
+						&& robot.getPixelColor(i, j).getBlue() <= potencyColor.getBlue() + 10)
 				{
-					if(minion.getPixelColor(i, j).equals(potencyColor.get(k)))
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}
@@ -128,7 +148,7 @@ public class GlyphMaker
 			{
 				for(int k = 0; k < aspectColor.size(); k++)
 				{
-					if(minion.getPixelColor(i, j).equals(aspectColor.get(k)))
+					if(robot.getPixelColor(i, j).equals(aspectColor.get(k)))
 					{
 						return true;
 					}
@@ -146,7 +166,7 @@ public class GlyphMaker
 			{
 				for(int k = 0; k < essenceColor.size(); k++)
 				{
-					if(minion.getPixelColor(i, j).equals(essenceColor.get(k)))
+					if(robot.getPixelColor(i, j).equals(essenceColor.get(k)))
 					{
 						return true;
 					}
@@ -156,45 +176,71 @@ public class GlyphMaker
 		return false;
 	}
 
-	// method not currently implemented
-	public boolean findPotency()
+	/*
+	 * This is a generic method for finding a rune. The first argument is the
+	 * location of the tab for which rune type you need. The second argument is
+	 * a valid color for that rune type. This method will then tab to the
+	 * correct rune page and search the inventory for a valid rune. Valid runes
+	 * are runes the player has access to and can use to craft a glyph.
+	 */
+	public boolean findRune(Point runeTab, Color targetColor)
 	{
-		minion.mouseMove(1790, 255);
+		// click on the tab to show the correct inventory of runes to look for
+		robot.mouseMove((int) runeTab.getX(), (int) runeTab.getY());
 		mouse.mouseClick();
-		for(int y = inventoryY1; y <= inventoryY2; y++)
+		robot.delay(500);
+		// Create a temp Point and search for valid rune within inventory
+		Point newRuneLocation = inventoryCheck(targetColor);
+		robot.delay(500);
+		//if executes when location of valid rune is found
+		if(newRuneLocation != null)
 		{
-			for(int x = inventoryX1; x <= inventoryX2; x++)
-			{
-				for(int k = 0; k < potencyColor.size(); k++)
-				{
-					if(minion.getPixelColor(x, y).equals(potencyColor.get(k)))
-					{
-						minion.mouseMove(x, y);
-						minion.delay(2500);
-						mouse.doDoubleClick();
-						minion.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-						return true;
-					}
-				}
-			}
+			robot.mouseMove((int) newRuneLocation.getX(), (int) newRuneLocation.getY());
+			robot.delay(500);
+			mouse.doDoubleClick();
+			robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 
-		return false;
+	}
+	/*
+	 * This method used the targetColor and compares it against the *11*
+	 * 	inventory positions to see if a valid rune exists.
+	 * 	The methods utilizes -10/+10 variance on all RGB values to increase reliability.
+	 */
+	public Point inventoryCheck(Color targetColor)
+	{
+		Point returnPoint = null;
+		for(int i = 0; i < invPositions.size(); i++)
+		{
+			Color invPosColor = robot.getPixelColor((int) invPositions.get(i).getX(), (int) invPositions.get(i).getY());
+			if(invPosColor.getRed() >= targetColor.getRed() - 10 && invPosColor.getRed() <= targetColor.getRed() + 10
+					&& invPosColor.getGreen() >= targetColor.getGreen() - 10 && invPosColor.getGreen() <= targetColor.getGreen() + 10
+					&& invPosColor.getBlue() >= targetColor.getBlue() - 10 && invPosColor.getBlue() <= targetColor.getBlue() + 10)
+			{
+				returnPoint = new Point((int) invPositions.get(i).getX(), (int) invPositions.get(i).getY());
+				break;
+			}
+		}
+		return returnPoint;
 	}
 
 	public void makeGlyphs()
 	{
 
-		new Thread(new Runnable() 
+		new Thread(new Runnable()
 		{
 			@Override
-			public void run() 
+			public void run()
 			{
-				
-			
+
 				try
 				{
-					minion = new Robot();
+					robot = new Robot();
 				}
 				catch(AWTException e)
 				{
@@ -203,86 +249,86 @@ public class GlyphMaker
 				catch(Exception e)
 				{
 					System.out.println("unknown error at minion creation.");
-					view.addText("\nunknown error at minion creation.");
+					minionUI.addText("\nunknown error at minion creation.");
 				}
-		
+
 				// center of screen and make active window
-				minion.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
+				robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
 				mouse.mouseClick();
-				minion.delay(500);
-		
+				robot.delay(500);
+
 				do
 				{
 					potencyFound = false;
 					aspectFound = false;
 					essenceFound = false;
-		
+
 					if(potencyCheck())
 					{
-						System.out.println("POTENCY CHECK!");
-						view.addText("Potency Check!");
+						minionUI.addText("Potency Check!");
 						potencyFound = true;
 					}
 					else
 					{
-						System.out.println("Didnt find potency");
-						view.addText("Didnt find potency");
+						minionUI.addText("Didnt find potency");
 						potencyFound = false;
-						minion.delay(5000);
 						// add potency
+						minionUI.addText("Searching for new potency rune.");
+						if(findRune(potencyTab, potencyColor))
+						{
+							minionUI.addText("Found new potency.");
+							potencyFound = true;
+						}
+						else
+						{
+							minionUI.addText("Search for Potency rune failed.");
+						}
+
 					}
-		
+
 					if(aspectCheck())
 					{
-						System.out.println("ASPECT CHECK!");
-						view.addText("Aspect Check!");
+						minionUI.addText("Aspect Check!");
 						aspectFound = true;
 					}
 					else
 					{
-						System.out.println("Didnt find aspect");
-						view.addText("Didnt find aspect");
+						minionUI.addText("Didnt find aspect");
 						// add aspect
 						potencyFound = false;
 					}
-		
+
 					if(essenceCheck())
 					{
-						System.out.println("ESSENCE CHECK!");
-						view.addText("Essence Check!");
+						minionUI.addText("Essence Check!");
 						essenceFound = true;
 					}
 					else
 					{
-						System.out.println("Didnt find essence");
-						view.addText("Didnt find essence");
+						minionUI.addText("Didnt find essence");
 						// add essence
 						potencyFound = false;
 					}
-		
+
 					if(potencyFound && aspectFound && essenceFound)
 					{
-						System.out.println("Crafting now..");
-						view.addText("\nCrafting...");
-						minion.keyPress(KeyEvent.VK_R);
-						minion.keyRelease(KeyEvent.VK_R);
-						minion.delay(4000);
+						minionUI.addText("\nCrafting...");
+						robot.keyPress(KeyEvent.VK_R);
+						robot.keyRelease(KeyEvent.VK_R);
+						robot.delay(4000);
 					}
 					else
 					{
-						System.out.println("CRAFTING FAILED");
-						view.addText("\nCrafting failed");
+						minionUI.addText("\nCrafting failed");
 					}
-		
+
 				} // end of do
 				while(potencyFound && aspectFound && essenceFound);
-				System.out.println("FINISHED");
-			
-				view.addText("Glyph Maker is done.");
+
+				minionUI.addText("Glyph Maker is done.");
 			} // end of ren
 		}).start();
 
-		
 	}
-	
+
 }

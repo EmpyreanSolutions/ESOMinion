@@ -32,7 +32,6 @@ public class MinionUI
 	public MinionUI(MinionController minionController)
 	{
 		this.minionController = minionController;
-		System.out.println("me: " + this);
 		bPane = new BorderPane();
 		bPane.setBackground(new Background(new BackgroundFill(Color.GREY, CornerRadii.EMPTY, Insets.EMPTY)));
 		
@@ -84,20 +83,7 @@ public class MinionUI
 
 		exit.setOnAction(e ->
 		{	
-			try
-			{
-				addText("Terminating in 3...");
-				Thread.sleep(1000);
-				addText("Terminating in 2...");
-				Thread.sleep(1000);
-				addText("Terminating in 1...");
-				Thread.sleep(1000);
-				Platform.exit();
-			}
-			catch(InterruptedException e1)
-			{
-				e1.printStackTrace();
-			}	
+				Platform.exit();	
 		});
 	}
 
