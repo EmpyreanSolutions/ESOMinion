@@ -9,12 +9,10 @@ public class MinionController
 	public MinionController()
 	{
 		minionUI = new MinionUI(this);
-		System.out.println("mcv: " + minionUI);
 	}
 	
 	public void runGlyphMaker()
 	{
-		System.out.println("Running Glyph Maker");
 		minionUI.addText("\nRunning Glyph Maker");
 		new GlyphMaker(minionUI);
 		
@@ -27,7 +25,6 @@ public class MinionController
 	
 	public void runGlyphDestroyerX10()
 	{
-		System.out.println("Running Glyph Destroyer");
 		minionUI.addText("Running Glyph Destroyer");
 		new GlyphDestroyer();
 		minionUI.addText("Glyph Destroyer is done.");
