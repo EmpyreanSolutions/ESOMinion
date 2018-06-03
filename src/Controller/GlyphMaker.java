@@ -138,16 +138,16 @@ public class GlyphMaker
 	 */
 	private boolean checkCenterRuneColor(Point p1, Point p2, Color targetColor)
 	{
-		for(int i = (int) p1.getY(); i < (int) p2.getY(); i++)
+		for(int i = (int) p1.getY(); i <= (int) p2.getY(); i++)
 		{
-			for(int j = (int) p1.getX(); j < (int) p2.getX(); j++)
+			for(int j = (int) p1.getX(); j <= (int) p2.getX(); j++)
 			{
-				if(robot.getPixelColor(i, j).getRed() >= potencyCenterColor.getRed() - centerColorVariance
-						&& robot.getPixelColor(i, j).getRed() <= potencyCenterColor.getRed() + centerColorVariance
-						&& robot.getPixelColor(i, j).getGreen() >= potencyCenterColor.getGreen() - centerColorVariance
-						&& robot.getPixelColor(i, j).getGreen() <= potencyCenterColor.getGreen() + centerColorVariance
-						&& robot.getPixelColor(i, j).getBlue() >= potencyCenterColor.getBlue() - centerColorVariance
-						&& robot.getPixelColor(i, j).getBlue() <= potencyCenterColor.getBlue() + centerColorVariance)
+				if(robot.getPixelColor(i, j).getRed() >= targetColor.getRed() - centerColorVariance
+						&& robot.getPixelColor(i, j).getRed() <= targetColor.getRed() + centerColorVariance
+						&& robot.getPixelColor(i, j).getGreen() >= targetColor.getGreen() - centerColorVariance
+						&& robot.getPixelColor(i, j).getGreen() <= targetColor.getGreen() + centerColorVariance
+						&& robot.getPixelColor(i, j).getBlue() >= targetColor.getBlue() - centerColorVariance
+						&& robot.getPixelColor(i, j).getBlue() <= targetColor.getBlue() + centerColorVariance)
 				{
 					return true;
 				}
