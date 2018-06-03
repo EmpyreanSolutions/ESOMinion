@@ -35,8 +35,8 @@ public class ColorPicker
 	public static void main(String[] args)
 	{
 		ColorPicker colorPicker = new ColorPicker();
-		int tempX = 950;
-		int tempY = 892;
+		int tempX = 850;
+		int tempY = 940;
 		colorPicker.robot.mouseMove(tempX, tempY);
 		Color c1 = colorPicker.robot.getPixelColor(tempX, tempY);
 		System.out.println(c1);

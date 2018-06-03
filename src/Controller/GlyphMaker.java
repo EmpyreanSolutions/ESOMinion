@@ -80,14 +80,14 @@ public class GlyphMaker
 		mouse = new MouseFunctions();
 
 		// center colors
-		potencyCenterColor = new Color(184, 200, 210);
+		potencyCenterColor = new Color(79, 81, 122);
 		essenceCenterColor = new Color(194, 200, 167);
 		aspectCenterColor = new Color(214, 196, 168);
 
 		// inventory colors
 		potencyInventoryColor = new Color(120, 130, 168);
 		essenceInventoryColor = new Color(131, 139, 82);
-		aspectInventoryColor = new Color(214, 196, 168);
+		aspectInventoryColor = new Color(115, 96, 71);
 
 		// screen
 		dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -95,8 +95,8 @@ public class GlyphMaker
 		SCREEN_HEIGHT = (int) dimension.getHeight();
 
 		// dimensions for center checks
-		potencySearchBoxTopLeftPoint = new Point(835, 893);
-		potencySearchBoxBottomRightPoint = new Point(850, 905);
+		potencySearchBoxTopLeftPoint = new Point(795, 893);
+		potencySearchBoxBottomRightPoint = new Point(850, 940);
 
 		essenceSearchBoxTopLeftPoint = new Point(950, 892);
 		essenceSearchBoxBottomRightPoint = new Point(970, 895);
@@ -127,7 +127,7 @@ public class GlyphMaker
 		aspectTab = new Point(1860, 260);
 
 		inventoryColorVariance = 20;
-		centerColorVariance = 20;
+		centerColorVariance = 10;
 
 		makeGlyphs();
 	}
