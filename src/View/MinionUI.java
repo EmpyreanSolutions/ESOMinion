@@ -11,8 +11,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import Controller.GlyphDestroyer;
-import Controller.GlyphMaker;
 import Controller.MinionController;
 import javafx.application.Platform;
 
@@ -37,7 +35,7 @@ public class MinionUI
 		
 		gMakerButton = new Button("Glyph Maker");
 		gMakerButton.setPrefWidth(150);
-		gDestroyerButton = new Button("Glyph Destroyer x10");
+		gDestroyerButton = new Button("G.D. --> BROKEN!");
 		gDestroyerButton.setPrefWidth(150);
 		exit = new Button("Terminate");
 		exit.setPrefWidth(150);
@@ -61,11 +59,11 @@ public class MinionUI
 		Scene scene = new Scene(bPane);
 		primaryStage.setTitle("EmpyreanSolutionsESOMinion");
 		primaryStage.setScene(scene);
-		primaryStage.setHeight(200);
-		primaryStage.setWidth(400);
+		primaryStage.setHeight(400);
+		primaryStage.setWidth(500);
 		primaryStage.setResizable(false);
-		primaryStage.setX(100);
-		primaryStage.setY(100);
+		primaryStage.setX(200);
+		primaryStage.setY(200);
 		primaryStage.show();
 	}
 	
@@ -100,13 +98,5 @@ public class MinionUI
 	public void addText(String text)
 	{
 		textArea.appendText("\n" + text);
-//		Platform.runLater(new Runnable()
-//		{
-//			@Override
-//			public void run()
-//			{
-//				textArea.appendText("\n" + text);						
-//			}
-//		});
 	}
 }

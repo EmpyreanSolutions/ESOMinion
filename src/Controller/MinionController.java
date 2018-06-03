@@ -13,20 +13,20 @@ public class MinionController
 	
 	public void runGlyphMaker()
 	{
-		minionUI.addText("\nRunning Glyph Maker");
+		minionUI.addText("Running Glyph Maker");
 		new GlyphMaker(minionUI);
 		
 	}
 	
 	public void runGlyphDestroyer()
 	{
-		
+		minionUI.addText("Running Glyph Destroyer");
+		new GlyphDestroyer();
 	}
 	
 	public void runGlyphDestroyerX10()
 	{
-		minionUI.addText("Running Glyph Destroyer");
+		minionUI.addText("Running Glyph DestroyerX10");
 		new GlyphDestroyer();
-		minionUI.addText("Glyph Destroyer is done.");
 	}
 }

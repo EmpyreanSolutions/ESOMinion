@@ -7,14 +7,11 @@ public class MinionStart extends Application
 	@Override
 	public void start(Stage primaryStage)
 	{
-		new MinionController();		
+		new MinionController();
 	}
-	
-	
+
 	public static void main(String[] args)
 	{
 		launch(args);
-		//sldfjlsdfj
 	}
-
 }
