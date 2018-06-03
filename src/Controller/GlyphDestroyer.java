@@ -15,12 +15,12 @@ public class GlyphDestroyer
 	private Dimension dimension;
 	private final int SCREEN_WIDTH;
 	private final int SCREEN_HEIGHT;
-	private Robot minion;
+	private Robot robot;
 	private ArrayList<Color> noGlyph;
 	private boolean glyphExists;
 	private boolean glyphFound;
 	private MouseFunctions mouse;
-	private MinionUI view;
+	private MinionUI minionUI;
 
 	public GlyphDestroyer()
 	{
@@ -31,7 +31,7 @@ public class GlyphDestroyer
 
 		try
 		{
-			minion = new Robot();
+			robot = new Robot();
 		}
 		catch(AWTException e)
 		{
@@ -58,7 +58,7 @@ public class GlyphDestroyer
 	{
 		for(int i = 0; i < noGlyph.size(); i++)
 		{
-			if(minion.getPixelColor(960, 905).equals(noGlyph.get(i)))
+			if(robot.getPixelColor(960, 905).equals(noGlyph.get(i)))
 			{
 				return false;
 			}
@@ -68,16 +68,16 @@ public class GlyphDestroyer
 
 	public void getNextGlyph()
 	{
-		minion.mouseMove(1410, 350);
+		robot.mouseMove(1410, 350);
 		mouse.doDoubleClick();
-		minion.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+		robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	}
 
 	public void destroyGlyphs()
 	{
-		minion.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
+		robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
 		mouse.mouseClick();
-		minion.delay(250);
+		robot.delay(250);
 
 		int count = 0;
 		do
@@ -86,27 +86,27 @@ public class GlyphDestroyer
 			glyphExists = glyphFound();
 			if(!glyphFound())
 			{
-				System.out.println("no glyph found");
+				minionUI.addText("No glyph found");
 				getNextGlyph();
 				if(glyphFound())
 				{
 					glyphExists = true;
-					System.out.println("NEXT GLYPH");
+					minionUI.addText("Found another glyph!");
 				}
 			}
 
 			if(glyphExists)
 			{
-				minion.delay(250);
-				minion.keyPress(KeyEvent.VK_R);
-				minion.keyRelease(KeyEvent.VK_R);
-				System.out.println("SUCCESSFUL DESTRUCTION");
-				minion.delay(1500);
+				robot.delay(250);
+				robot.keyPress(KeyEvent.VK_R);
+				robot.keyRelease(KeyEvent.VK_R);
+				minionUI.addText("Succesful Destruction");
+				robot.delay(1500);
 				count++;
 			}
 		}
 		while(glyphExists && count < 10);
-		System.out.println("FINISHED");
+		minionUI.addText("Glyph Destroyer is done.");
 	}
 
 }
