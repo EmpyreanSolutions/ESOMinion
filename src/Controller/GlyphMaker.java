@@ -79,10 +79,10 @@ public class GlyphMaker
 		this.minionUI = minionUI;
 		mouse = new MouseFunctions();
 
-		// center colors
-		potencyCenterColor = new Color(79, 81, 122);
-		essenceCenterColor = new Color(194, 200, 167);
-		aspectCenterColor = new Color(214, 196, 168);
+		// center colors. These colors are avgs of search box values. colorCenterVariance should allow a real color to be found.
+		potencyCenterColor = new Color(90, 93, 123); 
+		essenceCenterColor = new Color(115, 118, 76);
+		aspectCenterColor = new Color(142, 109, 70);
 
 		// inventory colors
 		potencyInventoryColor = new Color(120, 130, 168);
@@ -95,14 +95,14 @@ public class GlyphMaker
 		SCREEN_HEIGHT = (int) dimension.getHeight();
 
 		// dimensions for center checks
-		potencySearchBoxTopLeftPoint = new Point(795, 893);
+		potencySearchBoxTopLeftPoint = new Point(800, 895);
 		potencySearchBoxBottomRightPoint = new Point(850, 940);
 
-		essenceSearchBoxTopLeftPoint = new Point(950, 892);
-		essenceSearchBoxBottomRightPoint = new Point(970, 895);
+		essenceSearchBoxTopLeftPoint = new Point(950, 895);
+		essenceSearchBoxBottomRightPoint = new Point(970, 940);
 
-		aspectSearchBoxTopLeftPoint = new Point(1075, 894);
-		aspectSearchBoxBottomRightPoint = new Point(1090, 905);
+		aspectSearchBoxTopLeftPoint = new Point(1085, 895);
+		aspectSearchBoxBottomRightPoint = new Point(1105, 940);
 
 		// the inventory without scrolls has *11* visible positions
 		invPositions = new ArrayList<Point>();
@@ -126,7 +126,7 @@ public class GlyphMaker
 		essenceTab = new Point(1825, 260);
 		aspectTab = new Point(1860, 260);
 
-		inventoryColorVariance = 20;
+		inventoryColorVariance = 30; //bluVar ?= 39, grnVar =? 23, ojVar =?
 		centerColorVariance = 10;
 
 		makeGlyphs();
@@ -142,12 +142,12 @@ public class GlyphMaker
 		{
 			for(int j = (int) p1.getX(); j <= (int) p2.getX(); j++)
 			{
-				if(robot.getPixelColor(i, j).getRed() >= targetColor.getRed() - centerColorVariance
-						&& robot.getPixelColor(i, j).getRed() <= targetColor.getRed() + centerColorVariance
-						&& robot.getPixelColor(i, j).getGreen() >= targetColor.getGreen() - centerColorVariance
-						&& robot.getPixelColor(i, j).getGreen() <= targetColor.getGreen() + centerColorVariance
-						&& robot.getPixelColor(i, j).getBlue() >= targetColor.getBlue() - centerColorVariance
-						&& robot.getPixelColor(i, j).getBlue() <= targetColor.getBlue() + centerColorVariance)
+				if(robot.getPixelColor(i, j).getRed() >= (targetColor.getRed() - centerColorVariance)
+						&& robot.getPixelColor(i, j).getRed() <= (targetColor.getRed() + centerColorVariance)
+						&& robot.getPixelColor(i, j).getGreen() >= (targetColor.getGreen() - centerColorVariance)
+						&& robot.getPixelColor(i, j).getGreen() <= (targetColor.getGreen() + centerColorVariance)
+						&& robot.getPixelColor(i, j).getBlue() >= (targetColor.getBlue() - centerColorVariance)
+						&& robot.getPixelColor(i, j).getBlue() <= (targetColor.getBlue() + centerColorVariance))
 				{
 					return true;
 				}
@@ -224,7 +224,7 @@ public class GlyphMaker
 				// center of screen and make active window
 				robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
 				mouse.mouseClick();
-				robot.delay(500);
+				robot.delay(250);
 
 				do
 				{
@@ -232,6 +232,7 @@ public class GlyphMaker
 					essenceFound = false;
 					aspectFound = false;
 
+					minionUI.addText("Looking for potency rune..");
 					if(checkCenterRuneColor(potencySearchBoxTopLeftPoint, potencySearchBoxBottomRightPoint, potencyCenterColor))
 					{
 						minionUI.addText("Potency rune Check!");
@@ -260,6 +261,7 @@ public class GlyphMaker
 
 					}
 					
+					minionUI.addText("Looking for essence rune..");
 					if(checkCenterRuneColor(essenceSearchBoxTopLeftPoint, essenceSearchBoxBottomRightPoint, essenceCenterColor))
 					{
 						minionUI.addText("Essence rune Check!");
@@ -288,6 +290,7 @@ public class GlyphMaker
 
 					}
 
+					minionUI.addText("Looking for aspect rune..");
 					if(checkCenterRuneColor(aspectSearchBoxTopLeftPoint, aspectSearchBoxBottomRightPoint, aspectCenterColor))
 					{
 						minionUI.addText("Aspect rune Check!");
@@ -323,7 +326,7 @@ public class GlyphMaker
 						robot.keyRelease(KeyEvent.VK_R);
 						robot.delay(2000);
 						minionUI.addText("\nSuccess!\n");
-						robot.delay(2000);
+						//robot.delay(2000);
 					}
 					else
 					{

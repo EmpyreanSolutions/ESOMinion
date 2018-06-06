@@ -22,12 +22,14 @@ public class GlyphDestroyer
 	private MouseFunctions mouse;
 	private MinionUI minionUI;
 
-	public GlyphDestroyer()
+	public GlyphDestroyer(MinionUI minionUI)
 	{
 		// screen
 		dimension = Toolkit.getDefaultToolkit().getScreenSize();
 		SCREEN_WIDTH = (int) dimension.getWidth();
 		SCREEN_HEIGHT = (int) dimension.getHeight();
+		
+		this.minionUI = minionUI;
 
 		try
 		{
@@ -84,18 +86,17 @@ public class GlyphDestroyer
 		{
 
 			glyphExists = glyphFound();
-			if(!glyphFound())
+			if(!glyphExists)
 			{
 				minionUI.addText("No glyph found");
 				getNextGlyph();
-				if(glyphFound())
+				if(glyphExists)
 				{
 					glyphExists = true;
 					minionUI.addText("Found another glyph!");
 				}
 			}
-
-			if(glyphExists)
+			else
 			{
 				robot.delay(250);
 				robot.keyPress(KeyEvent.VK_R);
