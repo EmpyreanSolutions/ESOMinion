@@ -81,7 +81,9 @@ public class MinionUI
 
 		exit.setOnAction(e ->
 		{	
-				Platform.exit();	
+				Platform.exit();
+				System.exit(0);
+				
 		});
 	}
 
