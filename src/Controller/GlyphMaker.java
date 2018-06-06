@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import Utility.MouseFunctions;
 import View.MinionUI;
+import javafx.beans.property.adapter.ReadOnlyJavaBeanObjectProperty;
 
 public class GlyphMaker
 {
@@ -60,6 +61,9 @@ public class GlyphMaker
 	// integers for easy variance adjustment where Color checks are occuring
 	private int inventoryColorVariance;
 	private int centerColorVariance;
+	
+	//counter to let player know how many glyphs were completed
+	private int glyphCount;
 
 	public GlyphMaker(MinionUI minionUI)
 	{
@@ -127,28 +131,41 @@ public class GlyphMaker
 		aspectTab = new Point(1860, 260);
 
 		inventoryColorVariance = 30; //bluVar ?= 39, grnVar =? 23, ojVar =?
-		centerColorVariance = 10;
+		centerColorVariance = 20;
+		
+		glyphCount = 0;
 
 		makeGlyphs();
 	}
 
+	
+	public int getGlyphCount()
+	{
+		return glyphCount;
+	}
+	
 	/*
 	 * This method is for scanning each center box and verifying the existence
 	 * of a rune based on its color.
 	 */
 	private boolean checkCenterRuneColor(Point p1, Point p2, Color targetColor)
 	{
-		for(int i = (int) p1.getY(); i <= (int) p2.getY(); i++)
+		for(int y = (int) p1.getY(); y <= (int) p2.getY(); y++)
 		{
-			for(int j = (int) p1.getX(); j <= (int) p2.getX(); j++)
+			for(int x = (int) p1.getX(); x <= (int) p2.getX(); x++)
 			{
-				if(robot.getPixelColor(i, j).getRed() >= (targetColor.getRed() - centerColorVariance)
-						&& robot.getPixelColor(i, j).getRed() <= (targetColor.getRed() + centerColorVariance)
-						&& robot.getPixelColor(i, j).getGreen() >= (targetColor.getGreen() - centerColorVariance)
-						&& robot.getPixelColor(i, j).getGreen() <= (targetColor.getGreen() + centerColorVariance)
-						&& robot.getPixelColor(i, j).getBlue() >= (targetColor.getBlue() - centerColorVariance)
-						&& robot.getPixelColor(i, j).getBlue() <= (targetColor.getBlue() + centerColorVariance))
+				//System.out.println(i + "  " + j + "  " + robot.getPixelColor(i, j).getRed() + "  " + robot.getPixelColor(i, j).getGreen()  + "  " +  robot.getPixelColor(i, j).getBlue());
+				
+				if(robot.getPixelColor(x, y).getRed() >= (targetColor.getRed() - centerColorVariance)
+						&& robot.getPixelColor(x, y).getRed() <= (targetColor.getRed() + centerColorVariance)
+						&& robot.getPixelColor(x, y).getGreen() >= (targetColor.getGreen() - centerColorVariance)
+						&& robot.getPixelColor(x, y).getGreen() <= (targetColor.getGreen() + centerColorVariance)
+						&& robot.getPixelColor(x, y).getBlue() >= (targetColor.getBlue() - centerColorVariance)
+						&& robot.getPixelColor(x, y).getBlue() <= (targetColor.getBlue() + centerColorVariance))				
 				{
+					minionUI.addText("posXY " + x + "  " + y);
+					minionUI.addText("colorRGB " + robot.getPixelColor(x, y).getRed() + "  " + robot.getPixelColor(x, y).getGreen()
+							+ "  " +  robot.getPixelColor(x, y).getBlue());
 					return true;
 				}
 			}
@@ -213,6 +230,7 @@ public class GlyphMaker
 		return returnPoint;
 	}
 
+
 	private void makeGlyphs()
 	{
 
@@ -260,84 +278,90 @@ public class GlyphMaker
 						}
 
 					}
-					
-					minionUI.addText("Looking for essence rune..");
-					if(checkCenterRuneColor(essenceSearchBoxTopLeftPoint, essenceSearchBoxBottomRightPoint, essenceCenterColor))
+					if(potencyFound)
 					{
-						minionUI.addText("Essence rune Check!");
-						essenceFound = true;
-						robot.delay(250);
-					}
-					else
-					{
-						minionUI.addText("Didnt find essence");
-						essenceFound = false;
-						robot.delay(250);
-						// add essence
-						minionUI.addText("Searching for new essence rune.");
-						robot.delay(250);
-						if(getNextRune(essenceTab, essenceInventoryColor))
+						minionUI.addText("Looking for essence rune..");
+						if(checkCenterRuneColor(essenceSearchBoxTopLeftPoint, essenceSearchBoxBottomRightPoint, essenceCenterColor))
 						{
-							minionUI.addText("Found new essence rune.");
+							minionUI.addText("Essence rune Check!");
 							essenceFound = true;
 							robot.delay(250);
 						}
 						else
 						{
-							minionUI.addText("Search for essence rune failed.");
+							minionUI.addText("Didnt find essence");
+							essenceFound = false;
 							robot.delay(250);
+							// add essence
+							minionUI.addText("Searching for new essence rune.");
+							robot.delay(250);
+							if(getNextRune(essenceTab, essenceInventoryColor))
+							{
+								minionUI.addText("Found new essence rune.");
+								essenceFound = true;
+								robot.delay(250);
+							}
+							else
+							{
+								minionUI.addText("Search for essence rune failed.");
+								robot.delay(250);
+							}
+
 						}
-
-					}
-
-					minionUI.addText("Looking for aspect rune..");
-					if(checkCenterRuneColor(aspectSearchBoxTopLeftPoint, aspectSearchBoxBottomRightPoint, aspectCenterColor))
-					{
-						minionUI.addText("Aspect rune Check!");
-						aspectFound = true;
-						robot.delay(250);
-					}
-					else
-					{
-						minionUI.addText("Did not find aspect rune");
-						aspectFound = false;
-						robot.delay(250);
-						// add aspect
-						minionUI.addText("Searching for new aspect rune.");
-						robot.delay(250);
-						if(getNextRune(aspectTab, aspectInventoryColor))
+						
+						if(essenceFound)
 						{
-							minionUI.addText("Found new aspect rune.");
-							aspectFound = true;
-							robot.delay(250);
-						}
-						else
-						{
-							minionUI.addText("Search for aspect rune failed.");
-							robot.delay(250);
-						}
-
-					}
+							minionUI.addText("Looking for aspect rune..");
+							if(checkCenterRuneColor(aspectSearchBoxTopLeftPoint, aspectSearchBoxBottomRightPoint, aspectCenterColor) && essenceFound)
+							{
+								minionUI.addText("Aspect rune Check!");
+								aspectFound = true;
+								robot.delay(250);
+							}
+							else
+							{
+								minionUI.addText("Did not find aspect rune");
+								aspectFound = false;
+								robot.delay(250);
+								// add aspect
+								minionUI.addText("Searching for new aspect rune.");
+								robot.delay(250);
+								if(getNextRune(aspectTab, aspectInventoryColor))
+								{
+									minionUI.addText("Found new aspect rune.");
+									aspectFound = true;
+									robot.delay(250);
+								}
+								else
+								{
+									minionUI.addText("Search for aspect rune failed.");
+									robot.delay(250);
+								}
+							}
+						} //end of aspect	
+					} //end of essence
+					
 
 					if(potencyFound && essenceFound && aspectFound)
 					{
+						glyphCount+=1;
 						minionUI.addText("\nCrafting...");
 						robot.keyPress(KeyEvent.VK_R);
 						robot.keyRelease(KeyEvent.VK_R);
 						robot.delay(2000);
 						minionUI.addText("\nSuccess!\n");
-						//robot.delay(2000);
+						robot.delay(2000);
 					}
 					else
 					{
-						minionUI.addText("\nCrafting failed");
+						minionUI.addText("\nCrafting failed. You do not have one or more runes.");
 						robot.delay(250);
 					}
 
 				} // end of do
 				while(potencyFound && essenceFound && aspectFound);
 
-				minionUI.addText("Glyph Maker is done.");
+				minionUI.addText("Glyph Maker completed " + glyphCount + " glyphs.");
 			} // end of run
 		}).start(); // end of thread
 	}
