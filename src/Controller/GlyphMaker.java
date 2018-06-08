@@ -99,14 +99,14 @@ public class GlyphMaker
 		SCREEN_HEIGHT = (int) dimension.getHeight();
 
 		// dimensions for center checks
-		potencySearchBoxTopLeftPoint = new Point(800, 895);
-		potencySearchBoxBottomRightPoint = new Point(850, 940);
+		potencySearchBoxTopLeftPoint = new Point(810, 900);
+		potencySearchBoxBottomRightPoint = new Point(835, 930);
 
-		essenceSearchBoxTopLeftPoint = new Point(950, 895);
-		essenceSearchBoxBottomRightPoint = new Point(970, 940);
+		essenceSearchBoxTopLeftPoint = new Point(950, 900);
+		essenceSearchBoxBottomRightPoint = new Point(970, 930);
 
-		aspectSearchBoxTopLeftPoint = new Point(1085, 895);
-		aspectSearchBoxBottomRightPoint = new Point(1105, 940);
+		aspectSearchBoxTopLeftPoint = new Point(1085, 900);
+		aspectSearchBoxBottomRightPoint = new Point(1105, 930);
 
 		// the inventory without scrolls has *11* visible positions
 		invPositions = new ArrayList<Point>();
@@ -185,7 +185,7 @@ public class GlyphMaker
 		// click on the tab to show the correct inventory of runes to look for
 		robot.mouseMove((int) runeTab.getX(), (int) runeTab.getY());
 		mouse.mouseClick();
-		robot.delay(500);
+		robot.delay(250);
 		// Create a temp Point and search for valid rune within inventory
 		Point newRuneLocation = findRuneInInventory(targetColor);
 		robot.delay(500);
@@ -350,7 +350,7 @@ public class GlyphMaker
 						robot.keyRelease(KeyEvent.VK_R);
 						robot.delay(2000);
 						minionUI.addText("\nSuccess!\n");
-						robot.delay(2000);
+						robot.delay(2500);
 					}
 					else
 					{
