@@ -35,15 +35,16 @@ public class ColorPicker
 	public static void main(String[] args)
 	{
 		ColorPicker colorPicker = new ColorPicker();
-		int tempX = 835;
-		int tempY = 930;
-		colorPicker.robot.mouseMove(tempX, tempY);
-		Color c1 = colorPicker.robot.getPixelColor(tempX, tempY);
+		int tempX = 1700;
+		int tempY = 1050;
+		colorPicker.robot.mouseMove(tempX,tempY);
+		colorPicker.robot.delay(250);
+		Color c1 = colorPicker.robot.getPixelColor(tempX,tempY);
 		System.out.println(c1);
 		colorPicker.robot.delay(250);
-		colorPicker.robot.mouseMove(tempX, tempY);
-		Color c2 = colorPicker.robot.getPixelColor(tempX, tempY);
-		System.out.println(c2);
+		//colorPicker.robot.mouseMove(tempX, tempY);
+		//Color c2 = colorPicker.robot.getPixelColor(tempX, tempY);
+		//System.out.println(c2);
 	}
 
 }

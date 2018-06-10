@@ -89,7 +89,7 @@ public class GlyphMaker
 		aspectCenterColor = new Color(142, 109, 70);
 
 		// inventory colors
-		potencyInventoryColor = new Color(120, 130, 168);
+		potencyInventoryColor = new Color(90, 93, 123);
 		essenceInventoryColor = new Color(131, 139, 82);
 		aspectInventoryColor = new Color(115, 96, 71);
 
@@ -154,8 +154,6 @@ public class GlyphMaker
 		{
 			for(int x = (int) p1.getX(); x <= (int) p2.getX(); x++)
 			{
-				//System.out.println(i + "  " + j + "  " + robot.getPixelColor(i, j).getRed() + "  " + robot.getPixelColor(i, j).getGreen()  + "  " +  robot.getPixelColor(i, j).getBlue());
-				
 				if(robot.getPixelColor(x, y).getRed() >= (targetColor.getRed() - centerColorVariance)
 						&& robot.getPixelColor(x, y).getRed() <= (targetColor.getRed() + centerColorVariance)
 						&& robot.getPixelColor(x, y).getGreen() >= (targetColor.getGreen() - centerColorVariance)
