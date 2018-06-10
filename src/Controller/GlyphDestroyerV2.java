@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Robot;
 import java.awt.Toolkit;
-import java.util.ArrayList;
+import java.awt.event.KeyEvent;
 
 import Utility.MouseFunctions;
 import View.MinionUI;
@@ -21,33 +21,42 @@ public class GlyphDestroyerV2
 	private Robot robot;
 	private MouseFunctions mouse;
 
-	// colors of glyphs
+	// glyph colors
 	private Color bronzeColor;
 	private Color silverColor;
 	private Color goldColor;
+	private Color[] glyphColors;
+
+	// color for inv check. Different logic than G.M. Using "E" Add color in
+	// bottom right for check
+	private Point invPosCheck;
+	private Point addPointBR;
+	private Color addColorBR;
 
 	// center point
-	private Point centerGylphPoint;
-
-	// search positions for runes in inventory
-	private ArrayList<Point> invPositions;
+	private Point topLeftCenterGylphPoint;
+	private Point bottomRightCenterGylphPoint;
 
 	// integers for easy variance adjustment where Color checks are occuring
-	private int inventoryColorVariance;
+	private int addColorVariance;
 	private int centerColorVariance;
 
 	// counter to let player know how many glyphs were completed
-	private int glyphCount;
+	private int gdCount;
+
+	private boolean glyphFound;
 
 	public GlyphDestroyerV2(MinionUI minionUI)
 	{
 		try
 		{
 			robot = new Robot();
-		} catch (AWTException e)
+		}
+		catch(AWTException e)
 		{
 			e.printStackTrace();
-		} catch (Exception e)
+		}
+		catch(Exception e)
 		{
 			minionUI.addText("\nUnknown error at minion creation.");
 		}
@@ -60,23 +69,146 @@ public class GlyphDestroyerV2
 		SCREEN_WIDTH = (int) dimension.getWidth();
 		SCREEN_HEIGHT = (int) dimension.getHeight();
 
-		// the inventory without scrolls has *11* visible positions
-		invPositions = new ArrayList<Point>();
-		invPositions.add(new Point(1420, 350));
-		invPositions.add(new Point(1420, 401));
-		invPositions.add(new Point(1420, 452));
-		invPositions.add(new Point(1420, 503));
-		invPositions.add(new Point(1420, 554));
-		invPositions.add(new Point(1420, 605));
-		invPositions.add(new Point(1420, 656));
-		invPositions.add(new Point(1420, 707));
-		invPositions.add(new Point(1420, 763));
-		invPositions.add(new Point(1420, 814));
-		invPositions.add(new Point(1420, 865));
-		
-		inventoryColorVariance = 30;
+		// glyph colors
+		bronzeColor = new Color(129, 106, 97);
+		silverColor = new Color(174, 171, 178);
+		goldColor = new Color(177, 136, 72);
+		glyphColors = new Color[] { bronzeColor, silverColor, goldColor };
+
+		// center glyph area
+		topLeftCenterGylphPoint = new Point(955, 905);
+		bottomRightCenterGylphPoint = new Point(965, 908);
+
+		// invCheck
+		invPosCheck = new Point(1450, 350);
+		addPointBR = new Point(1674, 1050);
+		addColorBR = new Color(255, 255, 255);
+
+		addColorVariance = 10;
 		centerColorVariance = 20;
-		
-		glyphCount = 0;
+
+		glyphFound = false;
+
+		gdCount = 0;
+
+		destroyGlyphs();
+	}
+
+	/*
+	 * This method is for scanning each center box and verifying the existence
+	 * of a glyph based on their colors i.e. bronze, silver, gold.
+	 */
+	private boolean checkCenterforGlyph(Point p1, Point p2, Color[] targetColors)
+	{
+		for(int y = (int) p1.getY(); y <= (int) p2.getY(); y++)
+		{
+			for(int x = (int) p1.getX(); x <= (int) p2.getX(); x++)
+			{
+				for(int i = 0; i < targetColors.length; i++)
+				{
+					if(robot.getPixelColor(x, y).getRed() >= (targetColors[i].getRed() - centerColorVariance)
+							&& robot.getPixelColor(x, y).getRed() <= (targetColors[i].getRed() + centerColorVariance)
+							&& robot.getPixelColor(x, y).getGreen() >= (targetColors[i].getGreen() - centerColorVariance)
+							&& robot.getPixelColor(x, y).getGreen() <= (targetColors[i].getGreen() + centerColorVariance)
+							&& robot.getPixelColor(x, y).getBlue() >= (targetColors[i].getBlue() - centerColorVariance)
+							&& robot.getPixelColor(x, y).getBlue() <= (targetColors[i].getBlue() + centerColorVariance))
+					{
+						minionUI.addText("posXY " + x + "  " + y);
+						minionUI.addText("colorRGB " + robot.getPixelColor(x, y).getRed() + "  " + robot.getPixelColor(x, y).getGreen() + "  "
+								+ robot.getPixelColor(x, y).getBlue());
+						return true;
+					}
+				}
+
+			}
+		}
+		return false;
+	}
+
+	private boolean findGlyph()
+	{
+		robot.mouseMove((int) invPosCheck.getX(), (int) invPosCheck.getY());
+		robot.delay(250);
+		if(robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getRed() >= (addColorBR.getRed() - addColorVariance)
+				&& robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getRed() <= (addColorBR.getRed() + addColorVariance)
+				&& robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getGreen() >= (addColorBR.getGreen() - addColorVariance)
+				&& robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getGreen() <= (addColorBR.getGreen() + addColorVariance)
+				&& robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getBlue() >= (addColorBR.getBlue() - addColorVariance)
+				&& robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getBlue() <= (addColorBR.getBlue() + addColorVariance))
+		{
+			robot.keyPress(KeyEvent.VK_E);
+			robot.keyRelease(KeyEvent.VK_E);
+			minionUI.addText("colro found: " + robot.getPixelColor((int)addPointBR.getX(), (int) addPointBR.getY()));
+			return true;
+		}
+		return false;
+	}
+
+	private void destroyGlyphs()
+	{
+
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				// center of screen and make active window
+				robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
+				mouse.mouseClick();
+				robot.delay(250);
+
+				do
+				{
+					glyphFound = false;
+					minionUI.addText("Checking for glyph");
+					robot.delay(250);
+					if(checkCenterforGlyph(topLeftCenterGylphPoint, bottomRightCenterGylphPoint, glyphColors))
+					{
+						minionUI.addText("Glyph ready!");
+						glyphFound = true;
+						robot.delay(250);
+
+					}
+					else
+					{
+						minionUI.addText("Gylph Check failed.");
+						robot.delay(250);
+						minionUI.addText("Looking for a new Glyph.");
+						robot.delay(250);
+						if(findGlyph())
+						{
+							minionUI.addText("New Glyph found!");
+							glyphFound = true;
+							robot.delay(250);
+						}
+						else
+						{
+							minionUI.addText("Couldn't find another Glyph to destroy.");
+							glyphFound = false;
+							robot.delay(250);
+						}
+					}
+
+					if(glyphFound)
+					{
+						minionUI.addText("Destroying Glyph!");
+						robot.keyPress(KeyEvent.VK_R);
+						robot.keyRelease(KeyEvent.VK_R);
+						robot.delay(1000);
+						minionUI.addText("Successful Destruction!!!");
+						gdCount++;
+						robot.delay(1000);
+					}
+					else
+					{
+						minionUI.addText("Destruction failed.");
+						robot.delay(250);
+					}
+
+				}
+				while(glyphFound);
+				minionUI.addText("Glyph Destroyer eradicated " + gdCount + " glyphs!");
+			} // end of run
+		}).start(); // end of thread
 	}
 }

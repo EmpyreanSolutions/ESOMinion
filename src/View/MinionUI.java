@@ -35,7 +35,7 @@ public class MinionUI
 		
 		gMakerButton = new Button("Glyph Maker");
 		gMakerButton.setPrefWidth(150);
-		gDestroyerButton = new Button("G.D. --> BROKEN!");
+		gDestroyerButton = new Button("Gylph Destroyer");
 		gDestroyerButton.setPrefWidth(150);
 		exit = new Button("Terminate");
 		exit.setPrefWidth(150);
@@ -76,7 +76,7 @@ public class MinionUI
 
 		gDestroyerButton.setOnAction(e ->
 		{
-			minionController.runGlyphDestroyerX10();
+			minionController.runGlyphDestroyer();
 		});
 
 		exit.setOnAction(e ->

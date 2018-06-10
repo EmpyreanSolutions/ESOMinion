@@ -21,12 +21,6 @@ public class MinionController
 	public void runGlyphDestroyer()
 	{
 		minionUI.addText("Running Glyph Destroyer");
-		new GlyphDestroyer(minionUI);
-	}
-	
-	public void runGlyphDestroyerX10()
-	{
-		minionUI.addText("Running Glyph DestroyerX10");
-		new GlyphDestroyer(minionUI);
+		new GlyphDestroyerV2(minionUI);
 	}
 }
