@@ -46,20 +46,9 @@ public class GlyphDestroyerV2
 
 	private boolean glyphFound;
 
-	public GlyphDestroyerV2(MinionUI minionUI)
+	public GlyphDestroyerV2(MinionUI minionUI) throws AWTException
 	{
-		try
-		{
-			robot = new Robot();
-		}
-		catch(AWTException e)
-		{
-			e.printStackTrace();
-		}
-		catch(Exception e)
-		{
-			minionUI.addText("\nUnknown error at minion creation.");
-		}
+		robot = new Robot();
 
 		this.minionUI = minionUI;
 		mouse = new MouseFunctions();
@@ -113,9 +102,6 @@ public class GlyphDestroyerV2
 							&& robot.getPixelColor(x, y).getBlue() >= (targetColors[i].getBlue() - centerColorVariance)
 							&& robot.getPixelColor(x, y).getBlue() <= (targetColors[i].getBlue() + centerColorVariance))
 					{
-						minionUI.addText("posXY " + x + "  " + y);
-						minionUI.addText("colorRGB " + robot.getPixelColor(x, y).getRed() + "  " + robot.getPixelColor(x, y).getGreen() + "  "
-								+ robot.getPixelColor(x, y).getBlue());
 						return true;
 					}
 				}
@@ -138,7 +124,6 @@ public class GlyphDestroyerV2
 		{
 			robot.keyPress(KeyEvent.VK_E);
 			robot.keyRelease(KeyEvent.VK_E);
-			minionUI.addText("colro found: " + robot.getPixelColor((int)addPointBR.getX(), (int) addPointBR.getY()));
 			return true;
 		}
 		return false;
