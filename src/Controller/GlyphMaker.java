@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 import Utility.MouseFunctions;
 import View.MinionUI;
 
-public class GlyphMaker
+public class GlyphMaker implements Runnable
 {
 	private MinionUI minionUI;
 	private Dimension dimension;
@@ -63,7 +63,7 @@ public class GlyphMaker
 
 	// counter to let player know how many glyphs were completed
 	private int glyphCount;
-
+	
 	public GlyphMaker(MinionUI minionUI) throws AWTException
 	{
 		robot = new Robot();
@@ -112,13 +112,6 @@ public class GlyphMaker
 		centerColorVariance = 20;
 
 		glyphCount = 0;
-
-		makeGlyphs();
-	}
-
-	public int getGlyphCount()
-	{
-		return glyphCount;
 	}
 
 	/*
@@ -152,20 +145,20 @@ public class GlyphMaker
 	 * correct rune page and search the inventory for a valid rune. Valid runes
 	 * are runes the player has access to and can use to craft a glyph.
 	 */
-	private boolean getNextRune(Point runeTab, Color targetColor)
+	private boolean getNextRune(Point runeTab, Color targetColor) throws InterruptedException
 	{
 		// click on the tab to show the correct inventory of runes to look for
 		robot.mouseMove((int) runeTab.getX(), (int) runeTab.getY());
 		mouse.mouseClick();
-		robot.delay(250);
+		Thread.sleep(250);
 		// Create a temp Point and search for valid rune within inventory
 		Point newRuneLocation = findRuneInInventory(targetColor);
-		robot.delay(500);
+		Thread.sleep(250);
 		// if executes when location of valid rune is found
 		if(newRuneLocation != null)
 		{
 			robot.mouseMove((int) newRuneLocation.getX(), (int) newRuneLocation.getY());
-			robot.delay(500);
+			Thread.sleep(500);
 			mouse.doDoubleClick();
 			robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 			return true;
@@ -205,141 +198,145 @@ public class GlyphMaker
 		return returnPoint;
 	}
 
-	private void makeGlyphs()
+	@Override
+	public void run()
 	{
-
-		new Thread(new Runnable()
+		try
 		{
-			@Override
-			public void run()
+			// center of screen and make active window
+			robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
+			mouse.mouseClick();
+			Thread.sleep(250);
+			// clicks on Creation to make sure bot is on right window
+			robot.mouseMove(1760, 205);
+			mouse.mouseClick();
+			Thread.sleep(250);
+
+			do
 			{
-				// center of screen and make active window
-				robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
-				mouse.mouseClick();
-				robot.delay(250);
-				// clicks on Creation to make sure bot is on right window
-				robot.mouseMove(1760, 210);
-				mouse.mouseClick();
-				robot.delay(250);
+				potencyFound = false;
+				essenceFound = false;
+				aspectFound = false;
 
-				do
+				minionUI.addText("Looking for potency rune..");
+				if(checkCenterRuneColor(potencySearchBoxTopLeftPoint, potencySearchBoxBottomRightPoint, potencyCenterColor))
 				{
+					minionUI.addText("Potency rune Check!");
+					potencyFound = true;
+					Thread.sleep(250);
+				}
+				else
+				{
+					minionUI.addText("Did not find potency rune");
 					potencyFound = false;
-					essenceFound = false;
-					aspectFound = false;
-
-					minionUI.addText("Looking for potency rune..");
-					if(checkCenterRuneColor(potencySearchBoxTopLeftPoint, potencySearchBoxBottomRightPoint, potencyCenterColor))
+					Thread.sleep(250);
+					// add potency
+					minionUI.addText("Searching for new potency rune.");
+					Thread.sleep(250);
+					if(getNextRune(potencyTab, potencyInventoryColor))
 					{
-						minionUI.addText("Potency rune Check!");
+						minionUI.addText("Found new potency rune.");
 						potencyFound = true;
-						robot.delay(250);
+						Thread.sleep(250);
 					}
 					else
 					{
-						minionUI.addText("Did not find potency rune");
-						potencyFound = false;
-						robot.delay(250);
-						// add potency
-						minionUI.addText("Searching for new potency rune.");
-						robot.delay(250);
-						if(getNextRune(potencyTab, potencyInventoryColor))
-						{
-							minionUI.addText("Found new potency rune.");
-							potencyFound = true;
-							robot.delay(250);
-						}
-						else
-						{
-							minionUI.addText("Search for Potency rune failed.");
-							robot.delay(250);
-						}
-
+						minionUI.addText("Search for Potency rune failed.");
+						Thread.sleep(250);
 					}
-					if(potencyFound)
+
+				}
+				if(potencyFound)
+				{
+					minionUI.addText("Looking for essence rune..");
+					if(checkCenterRuneColor(essenceSearchBoxTopLeftPoint, essenceSearchBoxBottomRightPoint, essenceCenterColor))
 					{
-						minionUI.addText("Looking for essence rune..");
-						if(checkCenterRuneColor(essenceSearchBoxTopLeftPoint, essenceSearchBoxBottomRightPoint, essenceCenterColor))
+						minionUI.addText("Essence rune Check!");
+						essenceFound = true;
+						Thread.sleep(250);
+					}
+					else
+					{
+						minionUI.addText("Didnt find essence");
+						essenceFound = false;
+						Thread.sleep(250);
+						// add essence
+						minionUI.addText("Searching for new essence rune.");
+						Thread.sleep(250);
+						if(getNextRune(essenceTab, essenceInventoryColor))
 						{
-							minionUI.addText("Essence rune Check!");
+							minionUI.addText("Found new essence rune.");
 							essenceFound = true;
-							robot.delay(250);
+							Thread.sleep(250);
 						}
 						else
 						{
-							minionUI.addText("Didnt find essence");
-							essenceFound = false;
-							robot.delay(250);
-							// add essence
-							minionUI.addText("Searching for new essence rune.");
-							robot.delay(250);
-							if(getNextRune(essenceTab, essenceInventoryColor))
-							{
-								minionUI.addText("Found new essence rune.");
-								essenceFound = true;
-								robot.delay(250);
-							}
-							else
-							{
-								minionUI.addText("Search for essence rune failed.");
-								robot.delay(250);
-							}
-
+							minionUI.addText("Search for essence rune failed.");
+							Thread.sleep(250);
 						}
 
-						if(essenceFound)
+					}
+
+					if(essenceFound)
+					{
+						minionUI.addText("Looking for aspect rune..");
+						if(checkCenterRuneColor(aspectSearchBoxTopLeftPoint, aspectSearchBoxBottomRightPoint, aspectCenterColor) && essenceFound)
 						{
-							minionUI.addText("Looking for aspect rune..");
-							if(checkCenterRuneColor(aspectSearchBoxTopLeftPoint, aspectSearchBoxBottomRightPoint, aspectCenterColor) && essenceFound)
+							minionUI.addText("Aspect rune Check!");
+							aspectFound = true;
+							Thread.sleep(250);
+						}
+						else
+						{
+							minionUI.addText("Did not find aspect rune");
+							aspectFound = false;
+							Thread.sleep(250);
+							// add aspect
+							minionUI.addText("Searching for new aspect rune.");
+							Thread.sleep(250);
+							if(getNextRune(aspectTab, aspectInventoryColor))
 							{
-								minionUI.addText("Aspect rune Check!");
+								minionUI.addText("Found new aspect rune.");
 								aspectFound = true;
-								robot.delay(250);
+								Thread.sleep(250);
 							}
 							else
 							{
-								minionUI.addText("Did not find aspect rune");
-								aspectFound = false;
-								robot.delay(250);
-								// add aspect
-								minionUI.addText("Searching for new aspect rune.");
-								robot.delay(250);
-								if(getNextRune(aspectTab, aspectInventoryColor))
-								{
-									minionUI.addText("Found new aspect rune.");
-									aspectFound = true;
-									robot.delay(250);
-								}
-								else
-								{
-									minionUI.addText("Search for aspect rune failed.");
-									robot.delay(250);
-								}
+								minionUI.addText("Search for aspect rune failed.");
+								Thread.sleep(250);
 							}
-						} // end of aspect
-					} // end of essence
+						}
+					} // end of aspect
+				} // end of essence
 
-					if(potencyFound && essenceFound && aspectFound)
-					{
-						glyphCount += 1;
-						minionUI.addText("\nCrafting...");
-						robot.keyPress(KeyEvent.VK_R);
-						robot.keyRelease(KeyEvent.VK_R);
-						robot.delay(2000);
-						minionUI.addText("\nSuccess!\n");
-						robot.delay(2500);
-					}
-					else
-					{
-						minionUI.addText("\nCrafting failed. You do not have one or more runes.");
-						robot.delay(250);
-					}
+				if(potencyFound && essenceFound && aspectFound)
+				{
+					glyphCount += 1;
+					minionUI.addText("\nCrafting...");
+					robot.keyPress(KeyEvent.VK_R);
+					robot.keyRelease(KeyEvent.VK_R);
+					Thread.sleep(2000);
+					minionUI.addText("\nSuccess!\n");
+					Thread.sleep(2500);
+					;
+				}
+				else
+				{
+					minionUI.addText("\nCrafting failed. You do not have one or more runes.");
+					Thread.sleep(250);
+				}
 
-				} // end of do
-				while(potencyFound && essenceFound && aspectFound);
+			} // end of do
+			while(potencyFound && essenceFound && aspectFound);
 
-				minionUI.addText("Glyph Maker completed " + glyphCount + " glyphs.");
-			} // end of run
-		}).start(); // end of thread
-	}
+			minionUI.addText("Glyph Maker completed " + glyphCount + " glyphs.");
+		}
+		catch(InterruptedException e)
+		{
+			minionUI.addText("Glyph Maker has been interrupted!");
+			return;
+		}
+
+	} // end of run
+
 }

@@ -11,7 +11,7 @@ import java.awt.event.KeyEvent;
 import Utility.MouseFunctions;
 import View.MinionUI;
 
-public class GlyphDestroyerV2
+public class GlyphDestroyerV2 implements Runnable
 {
 	private MinionUI minionUI;
 	private Dimension dimension;
@@ -80,7 +80,6 @@ public class GlyphDestroyerV2
 
 		gdCount = 0;
 
-		destroyGlyphs();
 	}
 
 	/*
@@ -111,10 +110,10 @@ public class GlyphDestroyerV2
 		return false;
 	}
 
-	private boolean findGlyph()
+	private boolean findGlyph() throws InterruptedException
 	{
 		robot.mouseMove((int) invPosCheck.getX(), (int) invPosCheck.getY());
-		robot.delay(250);
+		Thread.sleep(250);
 		if(robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getRed() >= (addColorBR.getRed() - addColorVariance)
 				&& robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getRed() <= (addColorBR.getRed() + addColorVariance)
 				&& robot.getPixelColor((int) addPointBR.getX(), (int) addPointBR.getY()).getGreen() >= (addColorBR.getGreen() - addColorVariance)
@@ -129,71 +128,76 @@ public class GlyphDestroyerV2
 		return false;
 	}
 
-	private void destroyGlyphs()
+	@Override
+	public void run()
 	{
-
-		new Thread(new Runnable()
+		try
 		{
-			@Override
-			public void run()
+			// center of screen and make active window
+			robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
+			mouse.mouseClick();
+			Thread.sleep(250);
+			// clicks on Destruction to make sure bot is on right window
+			robot.mouseMove(1800, 205);
+			mouse.mouseClick();
+			Thread.sleep(250);
+
+			do
 			{
-				// center of screen and make active window
-				robot.mouseMove(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); // 960,540
-				mouse.mouseClick();
-				robot.delay(250);
-
-				do
+				glyphFound = false;
+				minionUI.addText("Checking for glyph");
+				Thread.sleep(250);
+				if(checkCenterforGlyph(topLeftCenterGylphPoint, bottomRightCenterGylphPoint, glyphColors))
 				{
-					glyphFound = false;
-					minionUI.addText("Checking for glyph");
-					robot.delay(250);
-					if(checkCenterforGlyph(topLeftCenterGylphPoint, bottomRightCenterGylphPoint, glyphColors))
-					{
-						minionUI.addText("Glyph ready!");
-						glyphFound = true;
-						robot.delay(250);
-
-					}
-					else
-					{
-						minionUI.addText("Gylph Check failed.");
-						robot.delay(250);
-						minionUI.addText("Looking for a new Glyph.");
-						robot.delay(250);
-						if(findGlyph())
-						{
-							minionUI.addText("New Glyph found!");
-							glyphFound = true;
-							robot.delay(250);
-						}
-						else
-						{
-							minionUI.addText("Couldn't find another Glyph to destroy.");
-							glyphFound = false;
-							robot.delay(250);
-						}
-					}
-
-					if(glyphFound)
-					{
-						minionUI.addText("Destroying Glyph!");
-						robot.keyPress(KeyEvent.VK_R);
-						robot.keyRelease(KeyEvent.VK_R);
-						robot.delay(1000);
-						minionUI.addText("Successful Destruction!!!");
-						gdCount++;
-						robot.delay(1000);
-					}
-					else
-					{
-						minionUI.addText("Destruction failed.");
-						robot.delay(250);
-					}
+					minionUI.addText("Glyph ready!");
+					glyphFound = true;
+					Thread.sleep(250);
 
 				}
-				while(glyphFound);
-				minionUI.addText("Glyph Destroyer eradicated " + gdCount + " glyphs!");
-			} // end of run
-		}).start(); // end of thread
-	}
+				else
+				{
+					minionUI.addText("Gylph Check failed.");
+					Thread.sleep(250);
+					minionUI.addText("Looking for a new Glyph.");
+					Thread.sleep(250);
+					if(findGlyph())
+					{
+						minionUI.addText("New Glyph found!");
+						glyphFound = true;
+						Thread.sleep(250);
+					}
+					else
+					{
+						minionUI.addText("Couldn't find another Glyph to destroy.");
+						glyphFound = false;
+						Thread.sleep(250);
+					}
+				}
+
+				if(glyphFound)
+				{
+					minionUI.addText("Destroying Glyph!");
+					robot.keyPress(KeyEvent.VK_R);
+					robot.keyRelease(KeyEvent.VK_R);
+					Thread.sleep(1000);
+					minionUI.addText("Successful Destruction!!!");
+					gdCount++;
+					Thread.sleep(1000);
+				}
+				else
+				{
+					minionUI.addText("Destruction failed.");
+					Thread.sleep(250);
+				}
+
+			}
+			while(glyphFound);
+			minionUI.addText("Glyph Destroyer eradicated " + gdCount + " glyphs!");
+		}
+		catch(InterruptedException e)
+		{
+			minionUI.addText("Glyph Destroyer has been interrupted!");
+			return;
+		}
+	} // end of run
 }
