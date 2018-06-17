@@ -22,9 +22,9 @@ public class MinionUI
 	private Button gMakerButton;
 	private Button gDestroyerButton;
 	private Button exit;
-	
+
 	private TextArea textArea;
-	
+
 	private MinionController minionController;
 
 	public MinionUI(MinionController minionController)
@@ -32,14 +32,14 @@ public class MinionUI
 		this.minionController = minionController;
 		bPane = new BorderPane();
 		bPane.setBackground(new Background(new BackgroundFill(Color.GREY, CornerRadii.EMPTY, Insets.EMPTY)));
-		
+
 		gMakerButton = new Button("Glyph Maker");
 		gMakerButton.setPrefWidth(150);
 		gDestroyerButton = new Button("Gylph Destroyer");
 		gDestroyerButton.setPrefWidth(150);
-		exit = new Button("Terminate");
+		exit = new Button("Exit");
 		exit.setPrefWidth(150);
-		
+
 		textArea = new TextArea();
 		textArea.setText("Welcome to the Empyrean Solution to ESO's crafting.");
 		textArea.setEditable(false);
@@ -54,7 +54,7 @@ public class MinionUI
 		bPane.setCenter(textArea);
 
 		buttonActions();
-		
+
 		Stage primaryStage = new Stage();
 		Scene scene = new Scene(bPane);
 		primaryStage.setTitle("EmpyreanSolutionsESOMinion");
@@ -66,35 +66,25 @@ public class MinionUI
 		primaryStage.setY(200);
 		primaryStage.show();
 	}
-	
+
 	public void buttonActions()
 	{
 		gMakerButton.setOnAction(e ->
 		{
-			minionController.runGlyphMaker();			
+			minionController.newTask("gm");
 		});
 
 		gDestroyerButton.setOnAction(e ->
 		{
-			minionController.runGlyphDestroyer();
+			minionController.newTask("gd");
 		});
 
 		exit.setOnAction(e ->
-		{	
-				Platform.exit();
-				System.exit(0);
-				
+		{
+			minionController.threadStop();
+			Platform.exit();
+			System.exit(0);
 		});
-	}
-
-	public TextArea getTextArea()
-	{
-		return textArea;
-	}
-
-	public void setTextArea(TextArea textArea)
-	{
-		this.textArea = textArea;
 	}
 
 	public void addText(String text)
