@@ -88,14 +88,14 @@ public class GlyphMaker implements Runnable
 		SCREEN_HEIGHT = (int) dimension.getHeight();
 
 		// dimensions for center checks
-		potencySearchBoxTopLeftPoint = new Point(810, 900);
-		potencySearchBoxBottomRightPoint = new Point(835, 930);
+		potencySearchBoxTopLeftPoint = new Point(815, 900);
+		potencySearchBoxBottomRightPoint = new Point(820, 930);
 
-		essenceSearchBoxTopLeftPoint = new Point(950, 900);
-		essenceSearchBoxBottomRightPoint = new Point(970, 930);
+		essenceSearchBoxTopLeftPoint = new Point(955, 900);
+		essenceSearchBoxBottomRightPoint = new Point(960, 930);
 
-		aspectSearchBoxTopLeftPoint = new Point(1085, 900);
-		aspectSearchBoxBottomRightPoint = new Point(1105, 930);
+		aspectSearchBoxTopLeftPoint = new Point(1080, 900);
+		aspectSearchBoxBottomRightPoint = new Point(1085, 930);
 
 		invTopPoint = new Point(1420, 340);
 		invBottomPoint = new Point(1420, 875);
@@ -131,6 +131,7 @@ public class GlyphMaker implements Runnable
 						&& robot.getPixelColor(x, y).getBlue() >= (targetColor.getBlue() - centerColorVariance)
 						&& robot.getPixelColor(x, y).getBlue() <= (targetColor.getBlue() + centerColorVariance))
 				{
+					minionUI.addText("Found at: " + x + " X, " + y + " Y");
 					return true;
 				}
 			}
